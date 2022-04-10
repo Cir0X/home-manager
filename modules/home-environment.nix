@@ -595,11 +595,17 @@ in
           if [[ -e "$nixProfilePath"/manifest.json ]] ; then
             INSTALL_CMD="nix profile install"
             LIST_CMD="nix profile list"
+            REMOVE_CMD='nix profile remove'
             REMOVE_CMD_SYNTAX='nix profile remove {number | store path}'
           else
             INSTALL_CMD="nix-env -i"
             LIST_CMD="nix-env -q"
+            REMOVE_CMD='nix-env -e'
             REMOVE_CMD_SYNTAX='nix-env -e {package name}'
+          fi
+
+          if [ `$LIST_CMD | wc -l` -gt 0 ]; then
+             $LIST_CMD | cut -d ' ' -f 4 | $DRY_RUN_CMD xargs -t $REMOVE_CMD $VERBOSE_ARG
           fi
 
           if ! $DRY_RUN_CMD $INSTALL_CMD ${cfg.path} ; then
